@@ -15,7 +15,7 @@ router.get('/', (req, res) => {
 
 router.post('/', (req, res) => {
     if(!req.body.title || !req.body.contents) {
-        res.status(400).json({ errorMessage: "Please provide title and contents for the post." });
+        res.status(400).json({ error: "Please provide title and contents for the post." });
         return;
     }
     db.insert(req.body)
@@ -30,6 +30,16 @@ router.post('/', (req, res) => {
     })
     .catch(error => {
         res.status(500).json({ error: "There was an error while saving the post to the database." })
+    })
+})
+
+router.get('/:id', (req, res) => {
+    db.findById(req.params.id)
+    .then(data => {
+        res.status(200).json(data);
+    })
+    .catch(error => {
+        res.status(404).json({ error: "The post with the specified ID does not exist." })
     })
 })
 module.exports = router;
