@@ -36,6 +36,9 @@ router.post('/', (req, res) => {
 router.get('/:id', (req, res) => {
     db.findById(req.params.id)
     .then(data => {
+        if(!data || data.length === 0) {
+            throw new Error("Couldn't find post");
+        }
         res.status(200).json(data);
     })
     .catch(error => {
