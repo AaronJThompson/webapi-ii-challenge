@@ -6,6 +6,22 @@ const router = express.Router();
 
 //TODO: Stop returning array for specific posts and just return object
 
+const getPost = (id) => {
+    return new Promise((resolve, reject) => {
+        db.findById(id)
+        .then(post => {
+            if(!post || post.length === 0) {
+                reject("Post doesn't exist");
+            } else {
+                resolve(post);
+            }
+        })
+        .catch(error => {
+            reject(error);
+        })
+    })
+}
+
 router.get('/', (req, res) => {
     db.find()
     .then(data => {
@@ -50,7 +66,8 @@ router.get('/:id', (req, res) => {
 })
 
 router.get('/:id/comments', (req, res) => {
-    if(db.findById(req.params.id)) {
+    getPost(req.params.id)
+    .then(() => {
         db.findPostComments(req.params.id)
         .then(data => {
             res.status(200).json(data);
@@ -58,9 +75,10 @@ router.get('/:id/comments', (req, res) => {
         .catch(error => {
             res.status(500).json({ error: "The comments information could not be retrieved." });
         })
-    } else {
+    })
+    .catch(error => {
         res.status(404).json({ error: "The post with the specified ID does not exist." });
-    }
+    })
 })
 
 router.post('/:id/comments', (req, res) => {
@@ -68,7 +86,8 @@ router.post('/:id/comments', (req, res) => {
         res.status(400).json({ error: "Please provide text for the comment." });
         return;
     }
-    if(db.findById(req.params.id)) {
+    getPost(req.params.id)
+    .then(() => {
         const comment = {...req.body, post_id: req.params.id};
         db.insertComment(comment)
         .then(data => {
@@ -83,8 +102,9 @@ router.post('/:id/comments', (req, res) => {
         .catch(error => {
             res.status(500).json({ error: "There was an error while saving the comment to the database" });
         })
-    } else {
+    })
+    .catch(error => {
         res.status(404).json({ error: "The post with the specified ID does not exist." });
-    }
+    })
 })
 module.exports = router;
