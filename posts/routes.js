@@ -3,9 +3,6 @@ const db = require('../data/db');
 
 const router = express.Router();
 
-
-//TODO: Stop returning array for specific posts and just return object
-
 const getPost = (id) => {
     return new Promise((resolve, reject) => {
         db.findById(id)
@@ -53,12 +50,9 @@ router.post('/', (req, res) => {
 })
 
 router.get('/:id', (req, res) => {
-    db.findById(req.params.id)
-    .then(data => {
-        if(!data || data.length === 0) {
-            throw new Error("Couldn't find post");
-        }
-        res.status(200).json(data);
+    getPost(req.params.id)
+    .then(post => {
+        res.status(200).json(post);
     })
     .catch(error => {
         res.status(404).json({ error: "The post with the specified ID does not exist." });
