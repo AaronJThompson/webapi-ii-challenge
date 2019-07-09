@@ -13,7 +13,7 @@ const getPost = (id) => {
             if(!post || post.length === 0) {
                 reject("Post doesn't exist");
             } else {
-                resolve(post);
+                resolve(post[0]);
             }
         })
         .catch(error => {
@@ -101,6 +101,22 @@ router.post('/:id/comments', (req, res) => {
         })
         .catch(error => {
             res.status(500).json({ error: "There was an error while saving the comment to the database" });
+        })
+    })
+    .catch(error => {
+        res.status(404).json({ error: "The post with the specified ID does not exist." });
+    })
+})
+
+router.delete('/:id', (req, res) => {
+    getPost(req.params.id)
+    .then(post => {
+        db.remove(post.id)
+        .then(data => {
+            res.status(200).json(post);
+        })
+        .catch(error => {
+            res.status(500).json({ error: "The post could not be removed" });
         })
     })
     .catch(error => {
