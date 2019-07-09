@@ -3,4 +3,14 @@ const db = require('../data/db');
 
 const router = express.Router();
 
+router.get('/', (req, res) => {
+    db.find()
+    .then(data => {
+        res.status(200).json(data);
+    })
+    .catch(error => {
+        res.status(500).json({ error: "The posts information could not be retrieved." })
+    })
+})
+
 module.exports = router;
