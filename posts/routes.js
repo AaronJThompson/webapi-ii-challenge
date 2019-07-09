@@ -3,13 +3,16 @@ const db = require('../data/db');
 
 const router = express.Router();
 
+
+//TODO: Stop returning array for specific posts and just return object
+
 router.get('/', (req, res) => {
     db.find()
     .then(data => {
         res.status(200).json(data);
     })
     .catch(error => {
-        res.status(500).json({ error: "The posts information could not be retrieved." })
+        res.status(500).json({ error: "The posts information could not be retrieved." });
     })
 })
 
@@ -29,7 +32,7 @@ router.post('/', (req, res) => {
         })
     })
     .catch(error => {
-        res.status(500).json({ error: "There was an error while saving the post to the database." })
+        res.status(500).json({ error: "There was an error while saving the post to the database." });
     })
 })
 
@@ -42,7 +45,21 @@ router.get('/:id', (req, res) => {
         res.status(200).json(data);
     })
     .catch(error => {
-        res.status(404).json({ error: "The post with the specified ID does not exist." })
+        res.status(404).json({ error: "The post with the specified ID does not exist." });
     })
+})
+
+router.get('/:id/comments', (req, res) => {
+    if(db.findById(req.params.id)) {
+        db.findPostComments(req.params.id)
+        .then(data => {
+            res.status(200).json(data);
+        })
+        .catch(error => {
+            res.status(500).json({ error: "The comments information could not be retrieved." });
+        })
+    } else {
+        res.status(404).json({ error: "The post with the specified ID does not exist." });
+    }
 })
 module.exports = router;
